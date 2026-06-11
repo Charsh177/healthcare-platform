@@ -1,0 +1,174 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: healthcare-postgres
+    environment:
+      POSTGRES_DB: healthcare_db
+      POSTGRES_USER: healthcare_user
+      POSTGRES_PASSWORD: healthcare_secure_password_123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/init-db.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - healthcare-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U healthcare_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: healthcare-gateway
+    environment:
+      SERVER_PORT: 8080
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8080:8080"
+    depends_on:
+      - auth-service
+      - patient-service
+      - claims-service
+      - billing-service
+      - file-service
+    networks:
+      - healthcare-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Auth Service
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: healthcare-auth
+    environment:
+      SERVER_PORT: 8081
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/healthcare_db
+      SPRING_DATASOURCE_USERNAME: healthcare_user
+      SPRING_DATASOURCE_PASSWORD: healthcare_secure_password_123
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - healthcare-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Patient Service
+  patient-service:
+    build:
+      context: ./patient-service
+      dockerfile: Dockerfile
+    container_name: healthcare-patient
+    environment:
+      SERVER_PORT: 8082
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/healthcare_db
+      SPRING_DATASOURCE_USERNAME: healthcare_user
+      SPRING_DATASOURCE_PASSWORD: healthcare_secure_password_123
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - healthcare-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Claims Service
+  claims-service:
+    build:
+      context: ./claims-service
+      dockerfile: Dockerfile
+    container_name: healthcare-claims
+    environment:
+      SERVER_PORT: 8083
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/healthcare_db
+      SPRING_DATASOURCE_USERNAME: healthcare_user
+      SPRING_DATASOURCE_PASSWORD: healthcare_secure_password_123
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - healthcare-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Billing Service
+  billing-service:
+    build:
+      context: ./billing-service
+      dockerfile: Dockerfile
+    container_name: healthcare-billing
+    environment:
+      SERVER_PORT: 8084
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/healthcare_db
+      SPRING_DATASOURCE_USERNAME: healthcare_user
+      SPRING_DATASOURCE_PASSWORD: healthcare_secure_password_123
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - healthcare-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8084/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # File Service
+  file-service:
+    build:
+      context: ./file-service
+      dockerfile: Dockerfile
+    container_name: healthcare-file
+    environment:
+      SERVER_PORT: 8085
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/healthcare_db
+      SPRING_DATASOURCE_USERNAME: healthcare_user
+      SPRING_DATASOURCE_PASSWORD: healthcare_secure_password_123
+      FILE_UPLOAD_DIR: /app/files
+    volumes:
+      - file_storage:/app/files
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - healthcare-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8085/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  file_storage:
+
+networks:
+  healthcare-network:
+    driver: bridge

@@ -1,0 +1,92 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: auth-service
+          uri: http://auth-service:8081
+          predicates:
+            - Path=/api/v1/auth/**
+          filters:
+            - StripPrefix=0
+
+        - id: patient-service
+          uri: http://patient-service:8082
+          predicates:
+            - Path=/api/v1/patients/**
+          filters:
+            - StripPrefix=0
+
+        - id: claims-service
+          uri: http://claims-service:8083
+          predicates:
+            - Path=/api/v1/claims/**
+          filters:
+            - StripPrefix=0
+
+        - id: billing-service
+          uri: http://billing-service:8084
+          predicates:
+            - Path=/api/v1/billing/**
+          filters:
+            - StripPrefix=0
+
+        - id: file-service
+          uri: http://file-service:8085
+          predicates:
+            - Path=/api/v1/files/**
+          filters:
+            - StripPrefix=0
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway: DEBUG
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+  cloud:
+    gateway:
+      routes:
+        - id: auth-service
+          uri: http://auth-service:8081
+          predicates:
+            - Path=/api/v1/auth/**
+
+        - id: patient-service
+          uri: http://patient-service:8082
+          predicates:
+            - Path=/api/v1/patients/**
+
+        - id: claims-service
+          uri: http://claims-service:8083
+          predicates:
+            - Path=/api/v1/claims/**
+
+        - id: billing-service
+          uri: http://billing-service:8084
+          predicates:
+            - Path=/api/v1/billing/**
+
+        - id: file-service
+          uri: http://file-service:8085
+          predicates:
+            - Path=/api/v1/files/**
