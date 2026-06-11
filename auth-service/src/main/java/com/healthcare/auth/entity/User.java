@@ -15,34 +15,36 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class User {
-    
+
     @Id
+    @Builder.Default
     private UUID userId = UUID.randomUUID();
-    
+
     @Column(unique = true, nullable = false)
     private String username;
-    
+
     @Column(nullable = false)
     private String passwordHash;
-    
+
     @Column(unique = true)
     private String email;
-    
-    @Column(nullable = false)
-    private UUID roleId;
-    
-    @Column(nullable = false)
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "role_id", nullable = false)
+    private Role role;
+
+    @Builder.Default
     private Boolean active = true;
-    
-    @Column(nullable = false, updatable = false)
+
+    @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
-    
+
     @Column
     private LocalDateTime updatedAt;
-    
+
     @Column
     private String createdBy;
-    
+
     @Column
     private String updatedBy;
 }

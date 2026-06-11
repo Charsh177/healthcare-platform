@@ -4,6 +4,8 @@ import com.healthcare.auth.dto.LoginRequest;
 import com.healthcare.auth.dto.TokenResponse;
 import com.healthcare.auth.dto.UserRegisterRequest;
 import com.healthcare.auth.entity.User;
+import com.healthcare.auth.entity.Role;
+import com.healthcare.auth.repository.RoleRepository;
 import com.healthcare.auth.repository.UserRepository;
 import com.healthcare.auth.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import java.util.UUID;
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -45,20 +48,31 @@ public class AuthService {
     }
 
     public User register(UserRegisterRequest request) {
+
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new RuntimeException("Username already exists");
         }
+
+        Role role = roleRepository.findById(UUID.fromString(request.getRoleId()))
+        .orElseThrow(() -> new RuntimeException("Role not found"));
 
         User user = User.builder()
                 .username(request.getUsername())
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
                 .email(request.getEmail())
-                .roleId(UUID.fromString(request.getRoleId()))
+                .role(role)  // Assign the Role entity
                 .active(true)
                 .build();
 
-        return userRepository.save(user);
-    }
+        log.info("Register request: {}", request);
+
+        User savedUser = userRepository.save(user);
+
+        log.info("Saved user: {}", savedUser);
+
+        return savedUser;
+
+}
 
     public TokenResponse refreshToken(String refreshToken) {
         if (!jwtTokenProvider.validateToken(refreshToken)) {

@@ -20,14 +20,26 @@
     </parent>
 
     <properties>
-        <java.version>25</java.version>
+        <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>25</maven.compiler.source>
-        <maven.compiler.target>25</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <lombok.version>1.18.30</lombok.version>
         <postgresql.version>42.7.4</postgresql.version>
         <spring-security.version>6.2.3</spring-security.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>2024.0.0</version> <!-- compatible with Boot 3.5.x -->
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <modules>
         <module>common-lib</module>
@@ -41,22 +53,22 @@
 
     <dependencies>
         <!-- Spring Boot Web -->
-        <dependency>
+        <!-- <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency> -->
 
         <!-- Spring Data JPA -->
-        <dependency>
+        <!-- <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
+        </dependency> -->
 
         <!-- Spring Security -->
-        <dependency>
+        <!-- <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
+        </dependency> -->
 
         <!-- PostgreSQL -->
         <dependency>
@@ -99,11 +111,11 @@
         </dependency>
 
         <!-- OpenAPI/Swagger -->
-        <dependency>
+        <!-- <dependency>
             <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
             <version>2.4.0</version>
-        </dependency>
+        </dependency> -->
 
         <!-- Testing -->
         <dependency>

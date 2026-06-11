@@ -22,7 +22,7 @@ echo "Java version: $JAVA_VERSION"
 echo "Starting PostgreSQL..."
 docker run -d --name healthcare-postgres \
     -e POSTGRES_DB=healthcare_db \
-    -e POSTGRES_USER=healthcare_user \
+    -e POSTGRES_USER=postgres \
     -e POSTGRES_PASSWORD=healthcare_secure_password_123 \
     -p 5432:5432 \
     -v postgres_data:/var/lib/postgresql/data \
