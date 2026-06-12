@@ -14,7 +14,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   datasource:
     url: jdbc:postgresql://localhost:5432/healthcare_db
-    username: healthcare_user
+    username: postgres
     password: healthcare_secure_password_123
     driver-class-name: org.postgresql.Driver
   servlet:
@@ -47,7 +47,7 @@ spring:
       on-profile: docker
   datasource:
     url: jdbc:postgresql://postgres:5432/healthcare_db
-    username: healthcare_user
+    username: postgres
     password: healthcare_secure_password_123
 
 file:
