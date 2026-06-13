@@ -37,4 +37,29 @@ public class AuthController {
         TokenResponse response = authService.refreshToken(token);
         return ResponseEntity.ok(ApiResponse.success(response, "Token refreshed successfully"));
     }
+
+    @GetMapping("/validate")
+    public ResponseEntity<ApiResponse<Boolean>> validate(@RequestParam("token") String token) {
+        boolean isValid = authService.validateToken(token); 
+        return ResponseEntity.ok(ApiResponse.success(isValid, "Token validation check complete"));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout(@RequestHeader("Authorization") String tokenHeader) {
+        String token = tokenHeader.replace("Bearer ", "");
+        authService.logout(token); // Clears or handles token deletion in service layer
+        return ResponseEntity.ok(ApiResponse.success(null, "Logged out successfully"));
+    }
+
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable("id") String userId) {
+        authService.deleteUser(userId);
+        return ResponseEntity.ok(ApiResponse.success(null, "User deleted successfully"));
+    }
+
+    @DeleteMapping("/roles/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteRole(@PathVariable("id") String roleId) {
+        authService.deleteRole(roleId);
+        return ResponseEntity.ok(ApiResponse.success(null, "Role deleted successfully"));
+    }
 }

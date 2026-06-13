@@ -25,7 +25,7 @@ spring:
       password: admin123
 
 jwt:
-  secret: your-super-secret-key-min-32-characters-long-1234567890
+  secret: 9xWb4pQ6zM2vE7rK5tY8uB3nC6mQ1wZ4vX7pL0kR3jH6fG9sD2aF5gH8jK1lM3nO
   expiration: 900000
   refresh:
     expiration: 2592000000
@@ -52,5 +52,5 @@ spring:
       on-profile: docker
   datasource:
     url: jdbc:postgresql://postgres:5432/healthcare_db
-    username: healthcare_user
+    username: postgres
     password: healthcare_secure_password_123
