@@ -25,13 +25,13 @@ public class ClaimController {
         return "Working";
     }
 
-    @PostMapping
+    @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
     public Claim createClaim(@Valid @RequestBody ClaimRequest request) {
         return service.createClaim(request);
     }
 
-    @GetMapping
+    @GetMapping("/getAll")
     public List<Claim> getAllClaims() {
         return service.getAllClaims();
     }

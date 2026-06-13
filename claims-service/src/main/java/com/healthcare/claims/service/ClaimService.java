@@ -15,6 +15,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+
 public class ClaimService {
 
     private final ClaimRepository repository;
@@ -53,8 +54,7 @@ public class ClaimService {
 
         Claim savedClaim = repository.save(claim);
 
-        log.info("Claim created successfully. Claim Number : {}",
-                savedClaim.getClaimNumber());
+        log.info("Claim created successfully. Claim Number : {}", savedClaim.getClaimNumber());
 
         return savedClaim;
     }
@@ -65,27 +65,19 @@ public class ClaimService {
 
     public Claim getClaim(Long id) {
 
-        return repository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException(
-                                "Claim not found with id : " + id));
+        return repository.findById(id).orElseThrow(() -> new RuntimeException("Claim not found with id : " + id));
     }
 
-    public Claim updateStatus(Long id,
-                              ClaimStatus status) {
+    public Claim updateStatus(Long id, ClaimStatus status) {
 
         Claim claim = getClaim(id);
 
-        validateStatusTransition(
-                claim.getStatus(),
-                status);
+        validateStatusTransition(claim.getStatus(), status);
 
         claim.setStatus(status);
         claim.setUpdatedAt(LocalDateTime.now());
 
-        log.info("Claim status updated. ClaimId={} Status={}",
-                id,
-                status);
+        log.info("Claim status updated. ClaimId={} Status={}", id, status);
 
         return repository.save(claim);
     }
@@ -99,38 +91,27 @@ public class ClaimService {
                 .toUpperCase();
     }
 
-    private void validateClaimRequest(
-            ClaimRequest request) {
+    private void validateClaimRequest(ClaimRequest request) {
 
-        if (request.getPatientId() == null) {
-            throw new IllegalArgumentException(
-                    "Patient Id is mandatory");
+        if (request.getPatientId() == null) { 
+            throw new IllegalArgumentException("Patient Id is mandatory");
         }
 
-        if (request.getClaimAmount() == null
-                || request.getClaimAmount() <= 0) {
+        if (request.getClaimAmount() == null || request.getClaimAmount() <= 0) {
 
-            throw new IllegalArgumentException(
-                    "Invalid claim amount");
+            throw new IllegalArgumentException("Invalid claim amount");
         }
 
-        if (request.getInsuranceCompany() == null
-                || request.getInsuranceCompany().isBlank()) {
+        if (request.getInsuranceCompany() == null || request.getInsuranceCompany().isBlank()) {
 
-            throw new IllegalArgumentException(
-                    "Insurance Company is mandatory");
+            throw new IllegalArgumentException("Insurance Company is mandatory");
         }
     }
 
-    private void validateStatusTransition(
-            ClaimStatus currentStatus,
-            ClaimStatus newStatus) {
+    private void validateStatusTransition(ClaimStatus currentStatus, ClaimStatus newStatus) {
 
-        if (currentStatus == ClaimStatus.SETTLED ||
-                currentStatus == ClaimStatus.REJECTED) {
-
-            throw new IllegalStateException(
-                    "Claim already completed");
+        if (currentStatus == ClaimStatus.SETTLED || currentStatus == ClaimStatus.REJECTED) {
+            throw new IllegalStateException("Claim already completed");
         }
     }
 }
